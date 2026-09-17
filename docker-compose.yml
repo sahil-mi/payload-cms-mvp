@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: payload
+      POSTGRES_PASSWORD: payload
+      POSTGRES_DB: payload_mvp
+    ports:
+      - '5442:5432'
+    volumes:
+      - payload_mvp_pgdata:/var/lib/postgresql/data
+
+volumes:
+  payload_mvp_pgdata:
