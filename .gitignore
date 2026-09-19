@@ -24,3 +24,4 @@ node_modules/
 # Claude Code session-local runtime state
 .claude/
 tsconfig.tsbuildinfo
+.env*

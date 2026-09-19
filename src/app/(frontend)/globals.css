@@ -132,6 +132,14 @@
   --brand-cyan: oklch(78% 0.13 199deg);
 }
 
+/* Scoped to the sticky header only (set via a `data-theme="dark"` attribute on the
+   <header> element itself while it overlaps a hero image) -- flips just the token the
+   nav/menu-button text relies on so it stays legible over a photo. This is not a
+   site-wide dark mode: nothing else ever sets `data-theme="dark"`. */
+[data-theme='dark'] {
+  --primary: oklch(97.8% 0.012 75deg);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
