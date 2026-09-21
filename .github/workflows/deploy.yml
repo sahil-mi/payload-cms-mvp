@@ -51,13 +51,16 @@ jobs:
       # Migrations run DDL, which is unsafe over a pgbouncer pooled connection.
       # Supabase provides POSTGRES_URL_NON_POOLING for exactly this case; the
       # deployed app still uses the pooled DATABASE_URI at runtime.
+      #
+      # Loaded via dotenv-cli (not shell `source`) because Postgres passwords
+      # routinely contain `$`/backtick characters that `source` would
+      # reinterpret as shell expansions and corrupt.
       - name: Run Payload database migrations
         run: |
-          set -a
-          . ./.env.production.local
-          set +a
-          export DATABASE_URI="${POSTGRES_URL_NON_POOLING:-$DATABASE_URI}"
-          pnpm payload migrate
+          pnpm dlx dotenv-cli -e .env.production.local -- bash -c '
+            export DATABASE_URI="${POSTGRES_URL_NON_POOLING:-$DATABASE_URI}"
+            exec pnpm payload migrate
+          '
 
       - name: Build project artifacts
         run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
