@@ -19,7 +19,11 @@ on:
 jobs:
   seed:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    # Pinned to the "production" GitHub Environment because that's where the
+    # VERCEL_TOKEN/VERCEL_ORG_ID/VERCEL_PROJECT_ID secrets are configured —
+    # unrelated to which Vercel environment (production/preview) is seeded,
+    # which is controlled below via inputs.environment.
+    environment: production
     steps:
       - name: Verify confirmation input
         if: inputs.confirm != 'SEED'
