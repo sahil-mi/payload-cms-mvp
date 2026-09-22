@@ -54,7 +54,10 @@ export const FormBlock: React.FC<
 
         const dataToSend = Object.entries(data).map(([name, value]) => ({
           field: name,
-          value,
+          // Payload's form-submissions schema stores this column NOT NULL, but
+          // an unfilled optional field submits as null/undefined — coerce to
+          // an empty string so the insert doesn't fail on that constraint.
+          value: value ?? '',
         }))
 
         // delay loading indicator by 1s
