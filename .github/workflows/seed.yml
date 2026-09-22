@@ -24,6 +24,9 @@ jobs:
     # unrelated to which Vercel environment (production/preview) is seeded,
     # which is controlled below via inputs.environment.
     environment: production
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
     steps:
       - name: Verify confirmation input
         if: inputs.confirm != 'SEED'
@@ -51,11 +54,14 @@ jobs:
       - name: Install Vercel CLI
         run: pnpm add -g vercel@latest
 
+      # `vercel env pull` alone doesn't auto-link a project from
+      # VERCEL_ORG_ID/VERCEL_PROJECT_ID — it needs an actual .vercel/project.json
+      # link on disk first, which `vercel pull` creates.
+      - name: Pull Vercel project settings
+        run: vercel pull --yes --environment=${{ inputs.environment }} --token=${{ secrets.VERCEL_TOKEN }}
+
       - name: Pull env vars
         run: vercel env pull .env.production.local --yes --environment=${{ inputs.environment }} --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       # Loaded via dotenv-cli (not shell `source`) because Postgres passwords
       # routinely contain `$`/backtick characters that `source` would
