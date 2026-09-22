@@ -3,6 +3,7 @@ import { nestedDocsPlugin } from '@payloadcms/plugin-nested-docs'
 import { redirectsPlugin } from '@payloadcms/plugin-redirects'
 import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
+import { s3Storage } from '@payloadcms/storage-s3'
 import { Plugin } from 'payload'
 import { revalidateRedirects } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
@@ -87,6 +88,24 @@ export const plugins: Plugin[] = [
       fields: ({ defaultFields }) => {
         return [...defaultFields, ...searchFields]
       },
+    },
+  }),
+  // Supabase Storage exposes an S3-compatible API, so uploads go through the
+  // standard S3 adapter rather than Payload's local filesystem storage —
+  // required since Vercel's serverless filesystem is ephemeral.
+  s3Storage({
+    collections: {
+      media: true,
+    },
+    bucket: process.env.SUPABASE_S3_BUCKET,
+    config: {
+      endpoint: process.env.SUPABASE_S3_ENDPOINT,
+      region: process.env.SUPABASE_S3_REGION,
+      credentials: {
+        accessKeyId: process.env.SUPABASE_S3_ACCESS_KEY_ID,
+        secretAccessKey: process.env.SUPABASE_S3_SECRET_ACCESS_KEY,
+      },
+      forcePathStyle: true,
     },
   }),
 ]
