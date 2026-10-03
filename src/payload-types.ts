@@ -227,6 +227,7 @@ export interface Page {
     | PricingBlock
     | ProjectGridBlock
     | SpacerBlock
+    | HtmlEmbedBlock
   )[];
   meta?: {
     title?: string | null;
@@ -1186,6 +1187,20 @@ export interface SpacerBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HtmlEmbedBlock".
+ */
+export interface HtmlEmbedBlock {
+  /**
+   * Embed code from a third-party service (video, map, calendar, form, widget). It is added to the page as-is, including any <script> tags, so only paste code from sources you trust.
+   */
+  html: string;
+  width: 'container' | 'narrow' | 'full';
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'htmlEmbed';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
@@ -1545,6 +1560,7 @@ export interface PagesSelect<T extends boolean = true> {
         pricing?: T | PricingBlockSelect<T>;
         projectGrid?: T | ProjectGridBlockSelect<T>;
         spacer?: T | SpacerBlockSelect<T>;
+        htmlEmbed?: T | HtmlEmbedBlockSelect<T>;
       };
   meta?:
     | T
@@ -1847,6 +1863,16 @@ export interface ProjectGridBlockSelect<T extends boolean = true> {
  */
 export interface SpacerBlockSelect<T extends boolean = true> {
   size?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "HtmlEmbedBlock_select".
+ */
+export interface HtmlEmbedBlockSelect<T extends boolean = true> {
+  html?: T;
+  width?: T;
   id?: T;
   blockName?: T;
 }

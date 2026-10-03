@@ -9,6 +9,7 @@ import { FAQBlock } from '@/blocks/FAQ/Component'
 import { FeatureGridBlock } from '@/blocks/FeatureGrid/Component'
 import { FormBlock } from '@/blocks/Form/Component'
 import { GalleryBlock } from '@/blocks/Gallery/Component'
+import { HtmlEmbedBlock } from '@/blocks/HtmlEmbed/Component'
 import { ImageTextBlock } from '@/blocks/ImageText/Component'
 import { LogoCloudBlock } from '@/blocks/LogoCloud/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
@@ -26,6 +27,7 @@ const blockComponents = {
   featureGrid: FeatureGridBlock,
   formBlock: FormBlock,
   gallery: GalleryBlock,
+  htmlEmbed: HtmlEmbedBlock,
   imageText: ImageTextBlock,
   logoCloud: LogoCloudBlock,
   mediaBlock: MediaBlock,
