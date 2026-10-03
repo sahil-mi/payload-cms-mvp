@@ -14,6 +14,8 @@ import { PostHero } from '@/heros/PostHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { JsonLd } from '@/components/JsonLd'
+import { postJsonLd } from '@/utilities/structuredData'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -54,6 +56,7 @@ export default async function Post({ params: paramsPromise }: Args) {
   return (
     <article className="pt-16 pb-16">
       <PageClient />
+      <JsonLd data={postJsonLd(post)} />
 
       {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={url} />
@@ -83,7 +86,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const decodedSlug = decodeURIComponent(slug)
   const post = await queryPostBySlug({ slug: decodedSlug })
 
-  return generateMeta({ doc: post })
+  return generateMeta({ collection: 'posts', doc: post })
 }
 
 const queryPostBySlug = cache(async ({ slug }: { slug: string }) => {

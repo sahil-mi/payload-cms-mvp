@@ -235,13 +235,51 @@ export interface Page {
      */
     image?: (number | null) | Media;
     description?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    /**
+     * Preferred URL for this content. Leave blank to use this page's own URL. Accepts an absolute URL or a path like /services.
+     */
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+    noFollow?: boolean | null;
+    schemaType?: ('WebPage' | 'AboutPage' | 'ContactPage' | 'CollectionPage') | null;
+    /**
+     * A schema.org object (or array of objects), e.g. { "@type": "Service", "name": "Brand strategy" }. "@context" is added automatically.
+     */
+    jsonLd?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
-  publishedAt?: string | null;
+  /**
+   * The address of this page on the website. It changes when you publish a new URL name.
+   */
+  path?: string | null;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
   generateSlug?: boolean | null;
+  /**
+   * The last part of the address, e.g. about-us. To change it, click Unlock, type lowercase words separated by hyphens, then publish. The old address keeps working and sends visitors here.
+   */
   slug: string;
+  /**
+   * Paste any old link to this page (the full address is fine). After you publish, visitors and Google are sent here automatically. When you change the URL name above, the previous URL is added here for you.
+   */
+  oldUrls?:
+    | {
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  publishedAt?: string | null;
+  lastPublishedPath?: string | null;
   parent?: (number | null) | Page;
   breadcrumbs?:
     | {
@@ -287,6 +325,26 @@ export interface Post {
      */
     image?: (number | null) | Media;
     description?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    /**
+     * Preferred URL for this content. Leave blank to use this page's own URL. Accepts an absolute URL or a path like /services.
+     */
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+    noFollow?: boolean | null;
+    /**
+     * A schema.org object (or array of objects), e.g. { "@type": "Service", "name": "Brand strategy" }. "@context" is added automatically.
+     */
+    jsonLd?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   publishedAt?: string | null;
   authors?: (number | Author)[] | null;
@@ -507,6 +565,26 @@ export interface Project {
      */
     image?: (number | null) | Media;
     description?: string | null;
+    ogTitle?: string | null;
+    ogDescription?: string | null;
+    /**
+     * Preferred URL for this content. Leave blank to use this page's own URL. Accepts an absolute URL or a path like /services.
+     */
+    canonicalUrl?: string | null;
+    noIndex?: boolean | null;
+    noFollow?: boolean | null;
+    /**
+     * A schema.org object (or array of objects), e.g. { "@type": "Service", "name": "Brand strategy" }. "@context" is added automatically.
+     */
+    jsonLd?:
+      | {
+          [k: string]: unknown;
+        }
+      | unknown[]
+      | string
+      | number
+      | boolean
+      | null;
   };
   publishedAt?: string | null;
   /**
@@ -1140,7 +1218,7 @@ export interface User {
 export interface Redirect {
   id: number;
   /**
-   * You will need to rebuild the website when changing this field.
+   * The old path, e.g. /old-page. For a page, it is easier to add old URLs in the page’s “URL & Redirects” tab.
    */
   from: string;
   to?: {
@@ -1160,6 +1238,10 @@ export interface Redirect {
         } | null);
     url?: string | null;
   };
+  /**
+   * Set when this redirect comes from a page’s “URL & Redirects” tab. Change it there, not here.
+   */
+  managedKey?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1470,10 +1552,25 @@ export interface PagesSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+        noFollow?: T;
+        schemaType?: T;
+        jsonLd?: T;
       };
-  publishedAt?: T;
+  path?: T;
   generateSlug?: T;
   slug?: T;
+  oldUrls?:
+    | T
+    | {
+        url?: T;
+        id?: T;
+      };
+  publishedAt?: T;
+  lastPublishedPath?: T;
   parent?: T;
   breadcrumbs?:
     | T
@@ -1769,6 +1866,12 @@ export interface PostsSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+        noFollow?: T;
+        jsonLd?: T;
       };
   publishedAt?: T;
   authors?: T;
@@ -1808,6 +1911,12 @@ export interface ProjectsSelect<T extends boolean = true> {
         title?: T;
         image?: T;
         description?: T;
+        ogTitle?: T;
+        ogDescription?: T;
+        canonicalUrl?: T;
+        noIndex?: T;
+        noFollow?: T;
+        jsonLd?: T;
       };
   publishedAt?: T;
   generateSlug?: T;
@@ -1979,6 +2088,7 @@ export interface RedirectsSelect<T extends boolean = true> {
         reference?: T;
         url?: T;
       };
+  managedKey?: T;
   updatedAt?: T;
   createdAt?: T;
 }

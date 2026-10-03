@@ -18,18 +18,19 @@ import { Spacer } from '../../blocks/Spacer/config'
 import { Stats } from '../../blocks/Stats/config'
 import { Testimonials } from '../../blocks/Testimonials/config'
 import { hero } from '@/heros/config'
-import { slugField } from 'payload'
 import { populatePublishedAt } from '../../hooks/populatePublishedAt'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { revalidateDelete, revalidatePage } from './hooks/revalidatePage'
 
+import { seoFields } from '../../fields/seo'
 import {
-  MetaDescriptionField,
-  MetaImageField,
-  MetaTitleField,
-  OverviewField,
-  PreviewField,
-} from '@payloadcms/plugin-seo/fields'
+  computePagePathHook,
+  deleteManagedRedirectsHook,
+  lastPublishedPathField,
+  normalizeOldUrlsHook,
+  syncOldUrlsHook,
+  urlRedirectsTab,
+} from '../../fields/urlRedirects'
 
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
@@ -110,30 +111,9 @@ export const Pages: CollectionConfig<'pages'> = {
         {
           name: 'meta',
           label: 'SEO',
-          fields: [
-            OverviewField({
-              titlePath: 'meta.title',
-              descriptionPath: 'meta.description',
-              imagePath: 'meta.image',
-            }),
-            MetaTitleField({
-              hasGenerateFn: true,
-            }),
-            MetaImageField({
-              relationTo: 'media',
-            }),
-
-            MetaDescriptionField({}),
-            PreviewField({
-              // if the `generateUrl` function is configured
-              hasGenerateFn: true,
-
-              // field paths to match the target field for data
-              titlePath: 'meta.title',
-              descriptionPath: 'meta.description',
-            }),
-          ],
+          fields: seoFields({ schemaTypeSelect: true }),
         },
+        urlRedirectsTab(),
       ],
     },
     {
@@ -143,12 +123,13 @@ export const Pages: CollectionConfig<'pages'> = {
         position: 'sidebar',
       },
     },
-    slugField(),
+    lastPublishedPathField,
   ],
   hooks: {
-    afterChange: [revalidatePage],
-    beforeChange: [populatePublishedAt],
-    afterDelete: [revalidateDelete],
+    beforeValidate: [normalizeOldUrlsHook],
+    beforeChange: [populatePublishedAt, computePagePathHook],
+    afterChange: [syncOldUrlsHook('pages'), revalidatePage],
+    afterDelete: [deleteManagedRedirectsHook('pages'), revalidateDelete],
   },
   versions: {
     drafts: {

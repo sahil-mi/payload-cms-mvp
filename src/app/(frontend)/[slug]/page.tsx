@@ -12,6 +12,8 @@ import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { JsonLd } from '@/components/JsonLd'
+import { pageJsonLd } from '@/utilities/structuredData'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -69,6 +71,7 @@ export default async function Page({ params: paramsPromise }: Args) {
   return (
     <article className="pt-16 pb-24">
       <PageClient />
+      <JsonLd data={pageJsonLd(page)} />
       {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={url} />
 
@@ -88,7 +91,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
     slug: decodedSlug,
   })
 
-  return generateMeta({ doc: page })
+  return generateMeta({ collection: 'pages', doc: page })
 }
 
 const queryPageBySlug = cache(async ({ slug }: { slug: string }) => {

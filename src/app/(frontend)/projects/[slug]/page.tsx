@@ -14,6 +14,8 @@ import { ProjectHero } from '@/heros/ProjectHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
+import { JsonLd } from '@/components/JsonLd'
+import { projectJsonLd } from '@/utilities/structuredData'
 
 export async function generateStaticParams() {
   const payload = await getPayload({ config: configPromise })
@@ -57,6 +59,7 @@ export default async function Project({ params: paramsPromise }: Args) {
   return (
     <article className="pt-16 pb-16">
       <PageClient />
+      <JsonLd data={projectJsonLd(project)} />
 
       {/* Allows redirects for valid pages too */}
       <PayloadRedirects disableNotFound url={url} />
@@ -113,7 +116,7 @@ export async function generateMetadata({ params: paramsPromise }: Args): Promise
   const decodedSlug = decodeURIComponent(slug)
   const project = await queryProjectBySlug({ slug: decodedSlug })
 
-  return generateMeta({ doc: project })
+  return generateMeta({ collection: 'projects', doc: project })
 }
 
 const queryProjectBySlug = cache(async ({ slug }: { slug: string }) => {
