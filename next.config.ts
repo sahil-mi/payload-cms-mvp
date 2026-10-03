@@ -45,6 +45,8 @@ const nextConfig: NextConfig = {
     return webpackConfig
   },
   reactStrictMode: true,
+  // src/proxy.ts removes trailing slashes itself (one hop for old URLs with a slash)
+  skipTrailingSlashRedirect: true,
   redirects,
   turbopack: {
     root: path.resolve(dirname),

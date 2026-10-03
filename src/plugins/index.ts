@@ -5,7 +5,7 @@ import { seoPlugin } from '@payloadcms/plugin-seo'
 import { searchPlugin } from '@payloadcms/plugin-search'
 import { s3Storage } from '@payloadcms/storage-s3'
 import { Plugin } from 'payload'
-import { revalidateRedirects } from '@/hooks/revalidateRedirects'
+import { revalidateRedirects, revalidateRedirectsOnDelete } from '@/hooks/revalidateRedirects'
 import { GenerateTitle, GenerateURL } from '@payloadcms/plugin-seo/types'
 import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/richtext-lexical'
 import { searchFields } from '@/search/fieldOverrides'
@@ -13,15 +13,16 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 
 import { Page, Post, Project } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+import { getDocPath, type SeoCollection } from '@/utilities/getDocPath'
 
 const generateTitle: GenerateTitle<Post | Page | Project> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Northbeam Studio` : 'Northbeam Studio'
 }
 
-const generateURL: GenerateURL<Post | Page | Project> = ({ doc }) => {
-  const url = getServerSideURL()
+const generateURL: GenerateURL<Post | Page | Project> = ({ collectionSlug, doc }) => {
+  const path = getDocPath(collectionSlug as SeoCollection, doc?.slug)
 
-  return doc?.slug ? `${url}/${doc.slug}` : url
+  return `${getServerSideURL()}${path === '/' ? '' : path}`
 }
 
 export const plugins: Plugin[] = [
@@ -30,20 +31,35 @@ export const plugins: Plugin[] = [
     overrides: {
       // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
       fields: ({ defaultFields }) => {
-        return defaultFields.map((field) => {
-          if ('name' in field && field.name === 'from') {
-            return {
-              ...field,
-              admin: {
-                description: 'You will need to rebuild the website when changing this field.',
-              },
+        return [
+          ...defaultFields.map((field) => {
+            if ('name' in field && field.name === 'from') {
+              return {
+                ...field,
+                admin: {
+                  description:
+                    'The old path, e.g. /old-page. For a page, it is easier to add old URLs in the page’s “URL & Redirects” tab.',
+                },
+              }
             }
-          }
-          return field
-        })
+            return field
+          }),
+          {
+            name: 'managedKey',
+            type: 'text',
+            index: true,
+            admin: {
+              position: 'sidebar',
+              readOnly: true,
+              description:
+                'Set when this redirect comes from a page’s “URL & Redirects” tab. Change it there, not here.',
+            },
+          },
+        ]
       },
       hooks: {
         afterChange: [revalidateRedirects],
+        afterDelete: [revalidateRedirectsOnDelete],
       },
     },
   }),

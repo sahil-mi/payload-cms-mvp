@@ -14,13 +14,7 @@ import { isAdminOrEditor } from '../../access/isAdminOrEditor'
 import { generatePreviewPath } from '../../utilities/generatePreviewPath'
 import { revalidateDelete, revalidateProject } from './hooks/revalidateProject'
 
-import {
-  MetaDescriptionField,
-  MetaImageField,
-  MetaTitleField,
-  OverviewField,
-  PreviewField,
-} from '@payloadcms/plugin-seo/fields'
+import { seoFields } from '../../fields/seo'
 
 export const Projects: CollectionConfig<'projects'> = {
   slug: 'projects',
@@ -155,25 +149,7 @@ export const Projects: CollectionConfig<'projects'> = {
         {
           name: 'meta',
           label: 'SEO',
-          fields: [
-            OverviewField({
-              titlePath: 'meta.title',
-              descriptionPath: 'meta.description',
-              imagePath: 'meta.image',
-            }),
-            MetaTitleField({
-              hasGenerateFn: true,
-            }),
-            MetaImageField({
-              relationTo: 'media',
-            }),
-            MetaDescriptionField({}),
-            PreviewField({
-              hasGenerateFn: true,
-              titlePath: 'meta.title',
-              descriptionPath: 'meta.description',
-            }),
-          ],
+          fields: seoFields(),
         },
       ],
     },

@@ -1,11 +1,12 @@
 import type { Metadata } from 'next'
 
-import type { Media, Page, Post, Config } from '../payload-types'
+import type { Media, Page, Post, Project, Config } from '../payload-types'
 
 import { mergeOpenGraph } from './mergeOpenGraph'
 import { getServerSideURL } from './getURL'
+import { getDocPath, type SeoCollection } from './getDocPath'
 
-const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
+export const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
   const serverUrl = getServerSideURL()
 
   let url = serverUrl + '/website-template-OG.webp'
@@ -20,30 +21,54 @@ const getImageURL = (image?: Media | Config['db']['defaultIDType'] | null) => {
 }
 
 export const generateMeta = async (args: {
-  doc: Partial<Page> | Partial<Post> | null
+  collection: SeoCollection
+  doc: Partial<Page> | Partial<Post> | Partial<Project> | null
 }): Promise<Metadata> => {
-  const { doc } = args
+  const { collection, doc } = args
+  const meta = doc?.meta
 
-  const ogImage = getImageURL(doc?.meta?.image)
+  const ogImage = getImageURL(meta?.image)
 
   // `doc.meta.title` is already the final, complete title (either hand-authored or
   // generated via the SEO plugin's `generateTitle`, which already appends the site name)
-  const title = doc?.meta?.title || 'Northbeam Studio'
+  const title = meta?.title || 'Northbeam Studio'
+  const description = meta?.description || undefined
+  const ogTitle = meta?.ogTitle || title
+  const ogDescription = meta?.ogDescription || description
+
+  const path = getDocPath(collection, doc?.slug)
+  // Relative canonicals are resolved against `metadataBase` set in the root layout.
+  // No doc (unknown slug → 404): emit no canonical rather than pointing at the homepage.
+  const canonical = meta?.canonicalUrl || (doc ? path : undefined)
 
   return {
-    description: doc?.meta?.description,
+    alternates: {
+      canonical,
+    },
+    description,
     openGraph: mergeOpenGraph({
-      description: doc?.meta?.description || '',
-      images: ogImage
-        ? [
-            {
-              url: ogImage,
-            },
-          ]
-        : undefined,
-      title,
-      url: Array.isArray(doc?.slug) ? doc?.slug.join('/') : '/',
+      description: ogDescription || '',
+      images: [{ url: ogImage }],
+      title: ogTitle,
+      url: path,
+      ...(collection === 'posts'
+        ? {
+            type: 'article',
+            publishedTime: doc?.publishedAt || undefined,
+            modifiedTime: doc?.updatedAt || undefined,
+          }
+        : {}),
     }),
+    robots: {
+      index: !meta?.noIndex,
+      follow: !meta?.noFollow,
+    },
     title,
+    twitter: {
+      card: 'summary_large_image',
+      description: ogDescription,
+      images: [ogImage],
+      title: ogTitle,
+    },
   }
 }

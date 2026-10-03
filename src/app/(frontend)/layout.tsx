@@ -14,9 +14,13 @@ import { draftMode } from 'next/headers'
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
+import { getCachedGlobal } from '@/utilities/getGlobals'
+import { siteJsonLd } from '@/utilities/structuredData'
+import { JsonLd } from '@/components/JsonLd'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
+  const siteSettings = await getCachedGlobal('siteSettings', 1)()
 
   return (
     <html
@@ -27,6 +31,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
         <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        <JsonLd data={siteJsonLd(siteSettings)} />
       </head>
       <body>
         <Providers>

@@ -22,6 +22,8 @@ const getProjectsSitemap = unstable_cache(
         _status: {
           equals: 'published',
         },
+        // Pages marked noindex shouldn't be advertised to crawlers
+        or: [{ 'meta.noIndex': { equals: false } }, { 'meta.noIndex': { exists: false } }],
       },
       select: {
         slug: true,
