@@ -15,6 +15,7 @@ import { MediaBlock } from '../../blocks/MediaBlock/config'
 import { Pricing } from '../../blocks/Pricing/config'
 import { ProjectGrid } from '../../blocks/ProjectGrid/config'
 import { Spacer } from '../../blocks/Spacer/config'
+import { HtmlEmbed } from '../../blocks/HtmlEmbed/config'
 import { Stats } from '../../blocks/Stats/config'
 import { Testimonials } from '../../blocks/Testimonials/config'
 import { hero } from '@/heros/config'
@@ -99,6 +100,7 @@ export const Pages: CollectionConfig<'pages'> = {
                 Pricing,
                 ProjectGrid,
                 Spacer,
+                HtmlEmbed,
               ],
               required: true,
               admin: {
